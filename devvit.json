@@ -24,8 +24,16 @@
       ]
     }
   },
-  "triggers": {
-    "onAppInstall": "/internal/triggers/on-app-install"
+  "menu": {
+    "items": [
+      {
+        "label": "Create a new post",
+        "description": "u/texthelpermd",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/post-create"
+      }
+    ]
   },
   "scripts": {
     "dev": "vite build --watch",

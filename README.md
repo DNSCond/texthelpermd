@@ -2,6 +2,13 @@
 
 a simple ***minimalistic*** posting ui for markdown.
 
+## howto use
+
+to get the post maker use the menu item on your subreddit.
+
+in the post maker, there is a `title` and a `body` field to
+enter the post's contents.
+
 ## todo
 
 - images.
