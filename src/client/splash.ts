@@ -23,5 +23,5 @@ form?.addEventListener('submit', event => {
     } else {
       showToast('Failed to submit post ' + JSON.stringify(json['error']));
     }
-  }).then(delayPromised(500));
+  }).then(delayPromised(500)).finally(() => preventSubmit = false);
 });

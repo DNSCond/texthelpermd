@@ -7,7 +7,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "devvit playtest",
-    "launch": "npm run type-check && devvit publish",
+    "launch": "npm run type-check && vite build && devvit publish --public",
     "login": "devvit login",
     "test": "vitest run",
     "type-check": "tsc --build"
