@@ -1,3 +1,20 @@
 body {
-    background-color: blue;
+    background-color: white;
+    font-family: monospace;
+}
+
+#textarea {
+    height: 70vh;
+}
+
+#textarea, #title {
+    width: 100%;
+    box-sizing: border-box;
+    font-family: monospace;
+}
+
+.flexbox {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
 }
