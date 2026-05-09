@@ -1,29 +1,23 @@
-/*
-this is a generic server setup i have at https://github.com/DNSCond/historyhiders
+import { Hono } from 'hono';
+import { serve } from '@hono/node-server';
+import { createServer, getServerPort } from '@devvit/web/server';
+import { api } from './routes/api';
+import { forms } from './routes/forms';
+import { menu } from './routes/menu';
+import { triggers } from './routes/triggers';
 
-try not to change much here.
+const app = new Hono();
+const internal = new Hono();
 
-all you have to do is add `export const router: Router = express.Router();` to your touter files and import that router here and add `app.use(router);`.
+internal.route('/menu', menu);
+internal.route('/form', forms);
+internal.route('/triggers', triggers);
 
-*/
-import express from "express";
-import {createServer, getServerPort} from "@devvit/web/server";
-import {router} from "./logic";import {router as internal} from "./internal-logic";
+app.route('/api', api);
+app.route('/internal', internal);
 
-const app = express();
-
-app.use(express.raw({type: "application/protobuf"}));
-// Middleware for JSON body parsing
-app.use(express.json());
-// Middleware for URL-encoded body parsing
-app.use(express.urlencoded({extended: true}));
-// Middleware for plain text body parsing
-app.use(express.text());
-
-// connect your routers to you express app.
-app.use(router);
-app.use(internal);
-
-const server = createServer(app);
-server.on("error", (err) => console.error(`server error; ${err.stack}`));
-server.listen(getServerPort());
+serve({
+  fetch: app.fetch,
+  createServer,
+  port: getServerPort(),
+});

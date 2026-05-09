@@ -17,11 +17,35 @@
     "dir": "dist/server",
     "entry": "index.cjs"
   },
-  "scripts": {
-    "build": "vite build",
-    "dev": "vite build --watch"
+  "menu": {
+    "items": [
+      {
+        "label": "Create a new post",
+        "description": "texthelpermd",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/post-create"
+      },
+      {
+        "label": "Example form",
+        "description": "Show a simple form",
+        "location": "subreddit",
+        "forUserType": "moderator",
+        "endpoint": "/internal/menu/example-form"
+      }
+    ]
   },
-  "permissions": {
-    "reddit": true
+  "forms": {
+    "exampleForm": "/internal/form/example-submit"
+  },
+  "triggers": {
+    "onAppInstall": "/internal/triggers/on-app-install"
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build"
+  },
+  "dev": {
+    "subreddit": "texthelpermd_dev"
   }
 }
