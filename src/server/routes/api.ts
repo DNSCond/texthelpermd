@@ -49,3 +49,15 @@ api.post('/image/finalize', async c => {
     return c.json({ error: String(error) }, 500);
   }
 });
+
+api.get('/currentUser', async c => {
+  const { username, subredditName } = context;
+  let result = { currentUserIsCurrentlyBanned: false, isApprovedUser: false, isLoggedIn: false };
+  if (username) {
+    result.isLoggedIn = true;
+    const options = { subredditName, username };
+    result.currentUserIsCurrentlyBanned = Boolean((await reddit.getBannedUsers(options).all()).length);
+    result.isApprovedUser = Boolean((await reddit.getApprovedUsers(options).all()).length);
+  }
+  return c.json(result, 200);
+});

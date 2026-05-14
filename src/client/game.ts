@@ -2,57 +2,68 @@ import { delayPromised, FormDataJSON } from './classes/FormDataJSON';
 import { showToast, navigateTo } from '@devvit/web/client';
 import { v4 as uuidv4 } from 'uuid';
 import { sliceBlob } from './functions/sliceBlob';
+import { currentUserIsCurrentlyBanned, isLoggedIn } from './first';
 
-let preventSubmit = false;
-const form = document.querySelector('form');
-form?.addEventListener('submit', async event => {
-  event.preventDefault();
-  if (preventSubmit) return showToast('no submitting in quick succession');
-  preventSubmit = true;
-  const blobs = await Promise.all(Array.from(document.querySelectorAll(
-      'canvas.image') as ArrayLike<HTMLCanvasElement>,
-    canvas => (new Promise<Blob | null>(res => canvas.toBlob(res)))));
-  const bodyData = new FormDataJSON(form);
-  if (blobs.length) {
-    showToast('images detected, uploading them');
-    try {
-      const allOk = await Promise.all(blobs.map(async blob => {
-        if (blob) {
-          const uuid = uuidv4();
-          const slices = sliceBlob(blob);
-          await Promise.all(slices.map((body, index) => fetch(`/api/image/upload?uuid=${uuid}&index=${index}`, {
-            headers: { 'content-type': 'application/octet-stream' },
-            method: 'POST', body,
-          }).then(resp => {
-            if (!resp.ok) throw resp;
-            return resp;
-          })));
-          return fetch(`/api/image/finalize?uuid=${uuid}&length=${slices.length}`, { method: 'POST' }).then(resp => {
-            if (!resp.ok) throw resp;
-            return resp.json().then(json => json.mediaUrl as string);
-          });
-        }
-      }));
-      bodyData.set('imageHrefs', allOk.join(' ').replaceAll(/ +/g, ' '));
-    } catch {
-      showToast('Failed to upload images');
-      return;
+if (isLoggedIn && !currentUserIsCurrentlyBanned) {
+  let preventSubmit = false;
+  const form = document.querySelector('form');
+  form?.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (preventSubmit) return showToast('no submitting in quick succession');
+    preventSubmit = true;
+    const blobs = await Promise.all(Array.from(document.querySelectorAll(
+        'canvas.image') as ArrayLike<HTMLCanvasElement>,
+      canvas => (new Promise<Blob | null>(res => canvas.toBlob(res)))));
+    const bodyData = new FormDataJSON(form);
+    if (blobs.length) {
+      showToast('images detected, uploading them');
+      try {
+        const allOk = await Promise.all(blobs.map(async blob => {
+          if (blob) {
+            const uuid = uuidv4();
+            const slices = sliceBlob(blob);
+            await Promise.all(slices.map((body, index) => fetch(`/api/image/upload?uuid=${uuid}&index=${index}`, {
+              headers: { 'content-type': 'application/octet-stream' },
+              method: 'POST', body,
+            }).then(resp => {
+              if (!resp.ok) throw resp;
+              return resp;
+            })));
+            return fetch(`/api/image/finalize?uuid=${uuid}&length=${slices.length}`, { method: 'POST' }).then(resp => {
+              if (!resp.ok) throw resp;
+              return resp.json().then(json => json.mediaUrl as string);
+            });
+          }
+        }));
+        bodyData.set('imageHrefs', allOk.join(' ').replaceAll(/ +/g, ' '));
+      } catch {
+        showToast('Failed to upload images');
+        return;
+      }
     }
-  }
-  const body = JSON.stringify(bodyData);
-  fetch('/api/posts', {
-    method: 'POST', body,
-    headers: { 'content-type': 'application/json' },
-  }).then(async resp => {
-    const json = await resp.json();
-    if (resp.ok) {
-      const { permalink } = json, to = new URL(permalink, 'https://reddit.com/');
-      navigateTo(`${to}`);
-    } else {
-      showToast('Failed to submit post ' + JSON.stringify(json['error']));
-    }
-  }).then(delayPromised(500)).finally(() => preventSubmit = false);
-});
+    const body = JSON.stringify(bodyData);
+    fetch('/api/posts', {
+      method: 'POST', body,
+      headers: { 'content-type': 'application/json' },
+    }).then(async resp => {
+      const json = await resp.json();
+      if (resp.ok) {
+        const { permalink } = json, to = new URL(permalink, 'https://reddit.com/');
+        navigateTo(`${to}`);
+      } else {
+        showToast('Failed to submit post ' + JSON.stringify(json['error']));
+      }
+    }).then(delayPromised(500)).finally(() => preventSubmit = false);
+  });
+  document.querySelector('button.add[type=button]')?.addEventListener('click', () => {
+    addImageOption();
+  });
+} else {
+  const submit = document.querySelector('form button[type=submit]')! as HTMLButtonElement;
+  document.querySelectorAll('form input,form textarea,form button').forEach(each => each.setAttribute('disabled', String()));
+  submit.textContent = currentUserIsCurrentlyBanned ? 'current User Is Currently Banned' : 'Your Not Logged In';
+  submit.disabled = true;
+}
 
 function addImageOption() {
   const tr = document.createElement('div'),
@@ -105,7 +116,3 @@ function addImageOption() {
   butt.append(mvDown, '\x20', mvUp, '\x20', del);
   document.querySelector('div.images')?.append(tr);
 }
-
-document.querySelector('button.add[type=button]')?.addEventListener('click', () => {
-  addImageOption();
-});

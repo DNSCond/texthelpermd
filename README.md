@@ -9,6 +9,15 @@ to get the post maker use the menu item on your subreddit.
 in the post maker, there is a `title` and a `body` field to
 enter the post's contents.
 
+## changelog
+
+### 0.0.5: `currentUserIsCurrentlyBanned`
+
+- is the usr who vies the webview post looks at it, they will be alerted if they are currently subreddit banned.
+- logged-out users will find a message saying they are logged out.
+
+### 0.0.4: REAl Initial Release
+
 ## todo
 
 - images.
