@@ -4,7 +4,7 @@ body {
 }
 
 #textarea {
-    height: 65vh;
+    height: 45vh;
 }
 
 #textarea, #title {
@@ -17,4 +17,43 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.35em;
+}
+
+h1 {
+    margin: 0.2em 0;
+}
+
+textarea, input {
+    margin: 0.5em 0;
+}
+
+.overflow-x {
+    overflow-x: scroll;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.border {
+    border: 3px solid #7c7c7c;
+}
+
+canvas {
+    box-sizing: border-box;
+    max-width: 80vw;
+    height: auto;
+}
+
+.padding-left {
+    padding-left: 1ch;
+}
+
+.margin-bottom {
+    margin-bottom: 1ch;
+}
+
+.border-control + .border-control {
+    margin-top: 1em;
 }
