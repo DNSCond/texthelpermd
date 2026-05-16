@@ -9,6 +9,10 @@ to get the post maker use the menu item on your subreddit.
 in the post maker, there is a `title` and a `body` field to
 enter the post's contents.
 
+## I'm confused how it helps with markdown?
+
+it helps in markdown in that you write markdown and what you wrote is submitted to reddit without escaping it.
+
 ## changelog
 
 ### 0.0.5: `currentUserIsCurrentlyBanned`

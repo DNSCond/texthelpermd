@@ -20,19 +20,41 @@
   "permissions": {
     "reddit": {
       "asUser": [
-        "SUBMIT_POST"
+        "SUBMIT_POST",
+        "SUBMIT_COMMENT"
       ]
     },
     "media": true
   },
+  "forms": {
+    "commentText": "/internal/forms/commentText",
+    "postText": "/internal/forms/postText"
+  },
   "menu": {
     "items": [
       {
-        "label": "Create a new post",
-        "description": "u/texthelpermd",
+        "label": "Create a interface Post",
+        "description": "u/texthelpermd (for mods)",
         "location": "subreddit",
         "forUserType": "moderator",
         "endpoint": "/internal/menu/post-create"
+      },
+      {
+        "label": "Create a new Post()",
+        "description": "u/texthelpermd (for user)",
+        "location": "subreddit",
+        "forUserType": "user",
+        "endpoint": "/internal/menu/post"
+      },
+      {
+        "label": "Reply-To: this",
+        "description": "u/texthelpermd",
+        "location": [
+          "comment",
+          "post"
+        ],
+        "forUserType": "user",
+        "endpoint": "/internal/menu/start-workflow"
       }
     ]
   },
