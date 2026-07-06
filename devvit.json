@@ -64,5 +64,8 @@
   },
   "dev": {
     "subreddit": "texthelpermd_dev"
+  },
+  "marketingAssets": {
+    "icon": "public/icon.png"
   }
 }
