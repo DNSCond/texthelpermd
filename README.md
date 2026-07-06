@@ -15,8 +15,7 @@ it helps in markdown in that you write markdown and what you wrote is submitted 
 
 ## changelog
 
-### 0.1.0: `usersCanAssignPostFlairs add .
-ad`
+### 0.1.0: `usersCanAssignPostFlairsad`
 
 - you can now assign post flair from the advanced editor.
 - users must be able to assign and edit flair for any to show up.
