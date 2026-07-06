@@ -116,3 +116,39 @@ function addImageOption() {
   butt.append(mvDown, '\x20', mvUp, '\x20', del);
   document.querySelector('div.images')?.append(tr);
 }
+
+const tags = document.getElementById('flairs')! as HTMLUListElement;
+{
+  const li = document.createElement('li');
+  const input = document.createElement('input');
+  const label = document.createElement('label');
+  label.append(input, '\x20', '[No Flair]');
+  input.style.color = '#ffffff';
+  input.value = 'Favicond-none';
+  input.checked = true;
+  input.name = 'flair';
+  input.type = 'radio';
+  li.append(label);
+  tags.append(li);
+}
+
+fetch('/api/flairs').then(resp => resp.json().then(json => resp.ok ? json : throwV(json))).then(resp => {
+  console.log(JSON.stringify(resp, null, 2));
+  (resp.flairs as any[]).forEach(flair => {
+    const li = document.createElement('li');
+    const input = document.createElement('input');
+    const label = document.createElement('label');
+    label.append(input, '\x20', flair.text);
+    label.style.backgroundColor = flair.color;
+    label.style.color = flair.theme === 'dark' ? '#000000' : '#ffffff';
+    input.value = flair.flair_template_id;
+    input.name = 'flair';
+    input.type = 'radio';
+    li.append(label);
+    tags.append(li);
+  });
+});
+
+function throwV(value: any): never {
+  throw value;
+}

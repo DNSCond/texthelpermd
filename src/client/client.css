@@ -57,3 +57,24 @@ canvas {
 .border-control + .border-control {
     margin-top: 1em;
 }
+
+#flairs {
+    margin: 0;
+
+    li {
+        margin: 0.5em 0;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            padding: 0.5em;
+            border-radius: 30px;
+        }
+    }
+}

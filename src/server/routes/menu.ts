@@ -25,7 +25,7 @@ menu.post('/post', async (c) => {
             type: 'string',
             name: 'title',
             label: 'Title',
-           required: true,
+            required: true,
           },
           {
             type: 'paragraph',
@@ -57,8 +57,15 @@ menu.post('start-workflow', async c => {
             name: 'replyTo',
             label: 'Reply-To',
             helpText: 'prepopulated, do not edit unless you know what you are doing. is a reddit id',
-            required: true,
+            required: true, defaultValue: contextItem.targetId,
           },
+          /*{type: 'select',
+            name: 'replyTo',
+            label: 'Reply-To',
+            options: [{ label: 'This Post', value: contextItem.targetId },
+            ], required: true, defaultValue: [contextItem.targetId],
+            helpText: 'prepopulated, do not edit unless you know what you are doing. is a reddit id',
+          },*/
           {
             type: 'paragraph',
             name: 'commentText',
@@ -69,7 +76,8 @@ menu.post('start-workflow', async c => {
           },
         ],
       },
-      data: { replyTo: contextItem.targetId },
+      // https://discord.com/channels/1050224141732687912/1523655342746239096/1523656242894209094
+      // data: { replyTo: contextItem.targetId, 'commentText': Date() },
     },
   });
 });

@@ -15,6 +15,12 @@ it helps in markdown in that you write markdown and what you wrote is submitted 
 
 ## changelog
 
+### 0.1.0: `usersCanAssignPostFlairs add .
+ad`
+
+- you can now assign post flair from the advanced editor.
+- users must be able to assign and edit flair for any to show up.
+
 ### 0.0.5: `currentUserIsCurrentlyBanned`
 
 - is the usr who vies the webview post looks at it, they will be alerted if they are currently subreddit banned.

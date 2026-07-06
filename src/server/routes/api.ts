@@ -5,14 +5,21 @@ export const api = new Hono();
 
 api.post('/posts', async c => {
   try {
-    const { textarea, title, imageHrefs } = await c.req.json(), imageUrls = imageHrefs?.split(/\s+/g);
-    console.log(imageUrls, imageHrefs);
-    const post = await reddit.submitPost({
+    const { textarea, title, imageHrefs, flair } = await c.req.json(),
+      imageUrls = imageHrefs?.split(/\s+/g);
+    let post;
+    const options: any = {
       subredditName: context.subredditName,
-      imageUrls, runAs: 'USER',
-      title, text: textarea,
-      kind: 'image',
-    });
+      runAs: 'USER', title, text: textarea,
+    };
+    console.log(flair);
+    if (flair !== 'Favicond-none' && flair !== 'on') {
+      options.flairId = flair;
+    }
+    if (imageUrls?.length) {
+      Object.assign(options, { imageUrls, kind: 'image' });
+    }
+    post = await reddit.submitPost(options);
     return c.json({ permalink: post.permalink }, 200);
   } catch (error) {
     console.error(error);
@@ -58,6 +65,24 @@ api.get('/currentUser', async c => {
     const options = { subredditName, username };
     result.currentUserIsCurrentlyBanned = Boolean((await reddit.getBannedUsers(options).all()).length);
     result.isApprovedUser = Boolean((await reddit.getApprovedUsers(options).all()).length);
+  }
+  return c.json(result, 200);
+});
+
+api.get('/flairs', async c => {
+  const result = { flairs: Array(0) }, sub = await reddit.getCurrentSubreddit();
+  const isMod = Boolean((await reddit.getModerators(context).all()).length);
+  if (sub.usersCanAssignPostFlairs) {
+    for (const flair of await reddit.getPostFlairTemplates(context.subredditName)) {
+      if (!isMod) if (flair.modOnly) continue;
+      result.flairs.push({
+        modOnly: flair.modOnly,
+        flair_template_id: flair.id,
+        color: flair.backgroundColor,
+        theme: flair.textColor,
+        text: flair.text,
+      });
+    }
   }
   return c.json(result, 200);
 });
