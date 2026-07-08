@@ -3,6 +3,8 @@ import { showToast, navigateTo } from '@devvit/web/client';
 import { v4 as uuidv4 } from 'uuid';
 import { sliceBlob } from './functions/sliceBlob';
 import { currentUserIsCurrentlyBanned, isLoggedIn } from './first';
+import { SetTimeElement } from './classes/setTimeElement';
+import './classes/FeatureCheckerButton';
 
 if (isLoggedIn && !currentUserIsCurrentlyBanned) {
   let preventSubmit = false;
@@ -15,7 +17,9 @@ if (isLoggedIn && !currentUserIsCurrentlyBanned) {
         'canvas.image') as ArrayLike<HTMLCanvasElement>,
       canvas => (new Promise<Blob | null>(res => canvas.toBlob(res)))));
     const bodyData = new FormDataJSON(form);
-    if (blobs.length) {
+    if (bodyData.get('action') === 'draft') {
+      showToast('Images cannot be drafted.');
+    } else if (blobs.length) {
       showToast('images detected, uploading them');
       try {
         const allOk = await Promise.all(blobs.map(async blob => {
@@ -48,6 +52,10 @@ if (isLoggedIn && !currentUserIsCurrentlyBanned) {
     }).then(async resp => {
       const json = await resp.json();
       if (resp.ok) {
+        if ('toasted' in json) {
+          showToast(String(json.toasted));
+          return;
+        }
         const { permalink } = json, to = new URL(permalink, 'https://reddit.com/');
         navigateTo(`${to}`);
       } else {
@@ -146,6 +154,27 @@ fetch('/api/flairs').then(resp => resp.json().then(json => resp.ok ? json : thro
     input.type = 'radio';
     li.append(label);
     tags.append(li);
+  });
+});
+
+fetch('/api/user-drafts').then(resp => resp.json().then(json => resp.ok ? json : throwV(json))).then(resp => {
+  console.log(JSON.stringify(resp, null, 2));
+  // noinspection JSPrimitiveTypeWrapperUsage
+  Object.values(resp.drafts as any[] ?? new Object).forEach(draft => {
+    const button = document.createElement('button');
+    const div = document.createElement('div'),
+      time = document.createElement('time', { is: 'settime-element' }) as SetTimeElement;
+    const pre = document.createElement('pre'),
+      span = document.createElement('span');
+    button.textContent = 'Delete Draft';
+    span.textContent = draft.title || '*empty*';
+    pre.textContent = draft.text || '*empty*';
+    div.append(span, pre, button);
+    if (time.isEnhanced) {
+      time.setTime(draft.draftedAt);
+      div.append('\x20', time);
+    }
+    document.querySelector('#raw-content-drafts')?.append(div);
   });
 });
 

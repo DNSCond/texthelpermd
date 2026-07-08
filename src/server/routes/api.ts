@@ -1,22 +1,31 @@
-import { Hono } from 'hono';
 import { context, reddit, redis, media } from '@devvit/web/server';
+import { redisCompressed } from '@devvit/redis';
+import { v4 as uuidv4 } from 'uuid';
+import { Hono } from 'hono';
 
-export const api = new Hono();
+export const api = new Hono;
 
 api.post('/posts', async c => {
   try {
-    const { textarea, title, imageHrefs, flair } = await c.req.json(),
+    const { textarea, title, imageHrefs, flair, action } = await c.req.json(),
       imageUrls = imageHrefs?.split(/\s+/g);
     let post;
     const options: any = {
       subredditName: context.subredditName,
       runAs: 'USER', title, text: textarea,
     };
-    console.log(flair);
+    console.log('action', action);
     if (flair !== 'Favicond-none' && flair !== 'on') {
       options.flairId = flair;
     }
-    if (imageUrls?.length) {
+    if (action === 'draft') {
+      options.draftedAt = new Date;
+      await redisCompressed.hSet(`drafts-${context.userId}`, {
+        [uuidv4()]: JSON.stringify(options),
+      });
+      await redisCompressed.expire(`drafts-${context.userId}`, 60 * 60 * 24 * 14);
+      return c.json({ toasted: 'saved to user drafts' }, 200);
+    } else if (imageUrls?.length) {
       Object.assign(options, { imageUrls, kind: 'image' });
     }
     post = await reddit.submitPost(options);
@@ -41,6 +50,7 @@ api.post('/image/upload', async c => {
     return c.json({ error: String(error) }, 500);
   }
 });
+
 api.post('/image/finalize', async c => {
   try {
     const uuid = c.req.query('uuid'), length = c.req.query('length')!;
@@ -66,6 +76,13 @@ api.get('/currentUser', async c => {
     result.currentUserIsCurrentlyBanned = Boolean((await reddit.getBannedUsers(options).all()).length);
     result.isApprovedUser = Boolean((await reddit.getApprovedUsers(options).all()).length);
   }
+  return c.json(result, 200);
+});
+
+api.get('/user-drafts', async c => {
+  let result = {
+    drafts: context.userId ? await redisCompressed.hGetAll(`drafts-${context.userId}`) : null,
+  };
   return c.json(result, 200);
 });
 
