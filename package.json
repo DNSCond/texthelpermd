@@ -23,7 +23,7 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@types/node": "^22.19.7",
+    "@types/node": "^26.1.2",
     "typescript": "5.8.3",
     "vite": "8.0.5"
   }
